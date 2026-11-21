@@ -2,21 +2,19 @@
 (() => {
   const cfg = window.ELETEC || {};
   
-  /* ---- Contact settings from config.js ---- */
+  /* ---- Contact settings from config.js ----
+     WhatsApp buttons, rows and forms ship hidden. They only appear once config.js has a number. */
   const wa = (cfg.whatsapp || '').replace(/\D/g, '');
-  document.querySelectorAll('[data-wa]').forEach(el => {
-    if (wa) {
-      el.removeAttribute('data-placeholder');
-      el.href = `https://wa.me/${wa}?text=${encodeURIComponent(cfg.whatsappMessage || 'Hello Eletec, I would like to ask about a lift.')}`;
-      const s = el.querySelector('small'); if (s) s.remove();
-    } else {
-      el.setAttribute('data-placeholder', '');
-      el.href = 'contact.html#whatsapp';
-    }
-  });
-  document.querySelectorAll('[data-email]').forEach(el => {
-    if (cfg.email) { el.textContent = cfg.email; el.href = `mailto:${cfg.email}`; }
-  });
+  const waLink = text => `https://wa.me/${wa}?text=${encodeURIComponent(text)}`;
+  if (wa) {
+    document.querySelectorAll('[data-wa]').forEach(el => { el.href = waLink(cfg.whatsappMessage || 'Hello Eletec, I would like to ask about a lift.'); el.hidden = false; });
+    document.querySelectorAll('[data-wa-text]').forEach(el => { el.href = waLink(cfg.whatsappMessage || ''); el.textContent = '+' + wa; });
+    document.querySelectorAll('[data-needs-wa]').forEach(el => { el.hidden = false; });
+  }
+  if (cfg.email) {
+    document.querySelectorAll('[data-email]').forEach(el => { el.textContent = cfg.email; el.href = `mailto:${cfg.email}`; });
+    document.querySelectorAll('[data-needs-email]').forEach(el => { el.hidden = false; });
+  }
 
   /* ---- English / 中文 ---- */
   const html = document.documentElement;
@@ -58,20 +56,40 @@
   closeBtn?.addEventListener('click', () => setMenu(false));
   document.addEventListener('keydown', e => { if (e.key === 'Escape' && menu?.dataset.open === 'true') setMenu(false); });
 
-  /* ---- Contact form: composes a WhatsApp message (or a call fallback) ---- */
+  /* ---- Forms: compose a WhatsApp message from the answers ---- */
+  const isZh = () => document.documentElement.lang === 'zh-Hans';
+  const shown = el => el.tagName === 'SELECT' ? el.options[el.selectedIndex].textContent.trim() : el.value.trim();
+  const missing = form => [...form.querySelectorAll('[required]')].find(el => !el.value.trim());
+
+  const fit = document.querySelector('[data-fit]');
+  if (fit && wa) {
+    const note = fit.querySelector('[data-form-note]');
+    fit.addEventListener('submit', e => {
+      e.preventDefault();
+      const gap = missing(fit);
+      if (gap) { note.textContent = isZh() ? '请填写所有必填项，再发送一次。' : 'Please answer every question, then send again.'; gap.focus(); return; }
+      const v = id => shown(fit.querySelector('#' + id));
+      const space = v('fit-space') || (isZh() ? '不确定' : 'not sure');
+      const text = isZh()
+        ? `您好 Eletec，我想了解我家能否安装电梯。\n房屋类型：${v('fit-house')}\n楼层数：${v('fit-floors')}\n大约可用空间：${space}\n时间安排：${v('fit-when')}\n姓名：${v('fit-name')}\n电话：${v('fit-phone')}`
+        : `Hello Eletec, will a lift fit my house?\nHouse type: ${v('fit-house')}\nNumber of floors: ${v('fit-floors')}\nRough space available: ${space}\nTimeline: ${v('fit-when')}\nName: ${v('fit-name')}\nPhone: ${v('fit-phone')}`;
+      location.href = waLink(text);
+    });
+  }
+
   const form = document.querySelector('[data-enquiry]');
-  if (form) {
+  if (form && wa) {
     const note = form.querySelector('[data-form-note]');
     form.addEventListener('submit', e => {
       e.preventDefault();
-      const d = new FormData(form);
-      const name = (d.get('name') || '').toString().trim();
-      const msg = (d.get('message') || '').toString().trim();
-      const zh = document.documentElement.lang === 'zh-Hans';
-      if (!name || !msg) { note.textContent = zh ? '请填写姓名和简短留言，再发送一次。' : 'Add your name and a short message, then send again.'; form.querySelector(name ? '#f-msg' : '#f-name').focus(); return; }
-      const text = zh ? `您好 Eletec，我是${name}。咨询：${d.get('topic')}。${msg}${d.get('phone') ? ` 我的电话：${d.get('phone')}` : ''}` : `Hello Eletec, this is ${name}. Enquiry: ${d.get('topic')}. ${msg}${d.get('phone') ? ` My number: ${d.get('phone')}` : ''}`;
-      if (wa) { location.href = `https://wa.me/${wa}?text=${encodeURIComponent(text)}`; }
-      else { note.textContent = zh ? '我们的 WhatsApp 号码正在设置中。请致电 6746 2908，我们会在电话中为您处理咨询。' : 'Our WhatsApp number is being set up. Please call 6746 2908 and we will take your enquiry by phone.'; }
+      const gap = missing(form);
+      if (gap) { note.textContent = isZh() ? '请填写姓名和简短留言，再发送一次。' : 'Add your name and a short message, then send again.'; gap.focus(); return; }
+      const v = id => shown(form.querySelector('#' + id));
+      const phone = v('f-phone');
+      const text = isZh()
+        ? `您好 Eletec，我是${v('f-name')}。咨询内容：${v('f-topic')}。${v('f-msg')}${phone ? `\n我的电话：${phone}` : ''}`
+        : `Hello Eletec, this is ${v('f-name')}. Topic: ${v('f-topic')}. ${v('f-msg')}${phone ? `\nMy number: ${phone}` : ''}`;
+      location.href = waLink(text);
     });
   }
 })();
