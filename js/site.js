@@ -46,6 +46,7 @@
     b.addEventListener('click', () => set(!li.classList.contains('is-open')));
     li.addEventListener('keydown', e => { if (e.key === 'Escape') { set(false); b.focus(); } });
     document.addEventListener('click', e => { if (!li.contains(e.target)) set(false); });
+    li.querySelectorAll('.dd a').forEach(a => a.addEventListener('click', () => { set(false); a.blur(); }));
   });
 
   /* ---- Menu ---- */
@@ -63,6 +64,7 @@
   if (menu) { menu.inert = true; }
   openBtn?.addEventListener('click', () => setMenu(true));
   closeBtn?.addEventListener('click', () => setMenu(false));
+  menu?.querySelectorAll('a[href]').forEach(a => a.addEventListener('click', () => setMenu(false)));
   document.addEventListener('keydown', e => { if (e.key === 'Escape' && menu?.dataset.open === 'true') setMenu(false); });
 
   /* ---- Forms: compose a WhatsApp message from the answers ---- */

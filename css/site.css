@@ -137,10 +137,11 @@ p { margin: 0; text-wrap: pretty; }
 .menu {
   position: fixed; inset: 0; z-index: 60; background: var(--indigo); color: var(--white);
   display: flex; flex-direction: column; padding: 0 var(--gutter) calc(24px + env(safe-area-inset-bottom));
+  overflow-y: auto; overscroll-behavior: contain;
   visibility: hidden; opacity: 0; transition: opacity .15s, visibility 0s .15s;
 }
 .menu[data-open="true"] { visibility: visible; opacity: 1; transition: opacity .15s; }
-.menu__top { height: var(--header-h); display: flex; align-items: center; justify-content: space-between; }
+.menu__top { flex: none; height: var(--header-h); display: flex; align-items: center; justify-content: space-between; }
 .menu ul { list-style: none; margin: 24px 0 0; padding: 0; border-top: 1px solid rgba(255,255,255,.18); }
 .menu li { border-bottom: 1px solid rgba(255,255,255,.18); }
 .menu a.menu__link { display: flex; justify-content: space-between; align-items: center; padding: 14px 0; text-decoration: none; font-size: clamp(1.5rem, 6vw, 2rem); font-stretch: 115%; font-weight: 300; }
