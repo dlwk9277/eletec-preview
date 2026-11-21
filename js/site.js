@@ -39,6 +39,15 @@
   if (html.lang === 'zh-Hans') setLang(true);
   document.querySelectorAll('[data-lang-toggle]').forEach(b => b.addEventListener('click', () => setLang(html.lang !== 'zh-Hans')));
 
+  /* ---- Projects dropdown ---- */
+  document.querySelectorAll('.has-dd').forEach(li => {
+    const b = li.querySelector('.dd-btn');
+    const set = o => { li.classList.toggle('is-open', o); b.setAttribute('aria-expanded', String(o)); };
+    b.addEventListener('click', () => set(!li.classList.contains('is-open')));
+    li.addEventListener('keydown', e => { if (e.key === 'Escape') { set(false); b.focus(); } });
+    document.addEventListener('click', e => { if (!li.contains(e.target)) set(false); });
+  });
+
   /* ---- Menu ---- */
   const menu = document.getElementById('menu');
   const openBtn = document.querySelector('[data-menu-open]');

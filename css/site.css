@@ -119,6 +119,20 @@ p { margin: 0; text-wrap: pretty; }
   .header-call, .header-wa { display: inline-flex; }
 }
 
+/* Projects dropdown (desktop) */
+.has-dd { position: relative; display: flex; align-items: center; }
+.dd-btn { background: none; border: 0; color: inherit; width: 28px; height: 44px; display: grid; place-items: center; cursor: pointer; padding: 0; }
+.dd-btn svg { width: 16px; height: 16px; transition: transform .15s; }
+.has-dd.is-open .dd-btn svg { transform: rotate(180deg); }
+.nav .dd { display: none; position: absolute; top: 100%; left: -16px; min-width: 260px; margin: 0; padding: 8px 0; flex-direction: column; gap: 0; background: var(--white, #fff); color: var(--ink); border: 1px solid var(--rule); box-shadow: 0 12px 32px rgba(0,0,0,.12); z-index: 70; }
+.has-dd.is-open .dd, .has-dd:hover .dd, .has-dd:focus-within .dd { display: flex; }
+.nav .dd a { display: block; padding: 11px 20px; white-space: nowrap; }
+.nav .dd a::after { display: none; }
+.nav .dd a:hover { background: var(--plaster-2); }
+.menu ul.menu__subs { margin: 0 0 12px; border: 0; padding-left: 4px; }
+.menu__subs li { border: 0; }
+.menu a.menu__sub { display: block; padding: 9px 0 9px 14px; text-decoration: none; font-size: 1.05rem; opacity: .8; border-left: 1px solid rgba(255,255,255,.25); }
+
 /* Menu panel (mobile) — a lobby directory board */
 .menu {
   position: fixed; inset: 0; z-index: 60; background: var(--indigo); color: var(--white);
