@@ -49,6 +49,14 @@
     li.querySelectorAll('.dd a').forEach(a => a.addEventListener('click', () => { set(false); a.blur(); }));
   });
 
+  /* ---- Menu: projects accordion ---- */
+  document.querySelectorAll('[data-acc]').forEach(b => b.addEventListener('click', () => {
+    const o = b.getAttribute('aria-expanded') !== 'true';
+    b.setAttribute('aria-expanded', String(o));
+    document.getElementById(b.getAttribute('aria-controls')).hidden = !o;
+    if (o) setTimeout(() => b.scrollIntoView({ block: 'start', behavior: 'smooth' }), 0);
+  }));
+
   /* ---- Menu ---- */
   const menu = document.getElementById('menu');
   const openBtn = document.querySelector('[data-menu-open]');
